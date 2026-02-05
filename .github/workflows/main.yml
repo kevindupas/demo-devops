@@ -1,0 +1,26 @@
+name: CI-CD-Demo-SysOps
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+
+      - name: Build de l'image Docker
+        # Étape de build automatique [cite: 325, 767]
+        run: docker build -t my-app:${{ github.sha }} .
+
+      - name: Simulation de Tests Unitaires
+        # Vérification du code avant déploiement [cite: 326, 327]
+        run: |
+          echo "Lancement des tests..."
+          docker run -d --name test-container my-app:${{ github.sha }}
+          sleep 5
+          docker exec test-container nginx -t
+          echo "Tests réussis !"
+          docker stop test-container
